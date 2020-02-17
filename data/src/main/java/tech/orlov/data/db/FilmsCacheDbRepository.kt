@@ -15,6 +15,11 @@ class FilmsCacheDbRepository @Inject constructor(
     private val filmsCacheDao: FilmsCacheDao,
     private val filmDboMapper: FilmDboMapper
 ) : FilmsCacheRepository {
+
+    companion object {
+        private const val CACHE_TIME = DateUtils.HOUR_IN_MILLIS * 2
+    }
+
     override fun getAllCachedFilms(): Maybe<List<Film>> {
         return getCahche(filmsCacheDao.getAllFilms())
             .subscribeOn(Schedulers.io())
@@ -56,9 +61,5 @@ class FilmsCacheDbRepository @Inject constructor(
         return filmsCacheDao.clearCacheTimestamp()
             .subscribeOn(Schedulers.io())
             .andThen(filmsCacheDao.clearFilmTable())
-    }
-
-    companion object {
-        private const val CACHE_TIME = DateUtils.HOUR_IN_MILLIS * 2
     }
 }
