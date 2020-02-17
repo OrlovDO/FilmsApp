@@ -16,9 +16,6 @@ class FilmsApiNetworkRepository @Inject constructor(
     override fun getAllFilms(): Single<List<Film>> {
         return filmsApi.getFilmsList()
             .subscribeOn(Schedulers.io())
-            .doOnSuccess {
-                Log.i("Net", it.toString())
-            }
             .map { it.films }
             .map(filmDtoMapper::mapFilmsListToEntity)
     }
