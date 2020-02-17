@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Ui</string>
+    <string name="error">Error, swipe to refresh</string>
+    <string name="title">Title</string>
+    <string name="overview">overview</string>
+    <string name="poster">Poster</string>
 </resources>
