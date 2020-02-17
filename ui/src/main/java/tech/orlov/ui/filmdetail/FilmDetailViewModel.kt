@@ -3,6 +3,7 @@ package tech.orlov.ui.filmdetail
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import tech.orlov.domain.usecases.GetFilmByIdCommand
 import tech.orlov.ui.formatters.FilmVoFormatter
 import tech.orlov.ui.vo.FilmVo
@@ -14,9 +15,11 @@ class FilmDetailViewModel @Inject constructor(
     private val filmVoFormatter: FilmVoFormatter
 ) : ViewModel() {
 
+    private val disposables = CompositeDisposable()
+    private var filmId: Long? = null
+
     val film = MutableLiveData<FilmVo>()
     val screenState = MutableLiveData<ScreenStateVo>()
-    private var filmId: Long? = null
 
     fun onStart(filmId: Long?) {
         screenState.value = ScreenStateVo.LOADING
@@ -29,7 +32,7 @@ class FilmDetailViewModel @Inject constructor(
             screenState.value = ScreenStateVo.LOADING
         }
         filmId?.let{
-            getFilmByIdCommand.getFilmById(it)
+            disposables.add(getFilmByIdCommand.getFilmById(it)
                 .map(filmVoFormatter::formatFilm)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ currentFilm ->
@@ -37,8 +40,12 @@ class FilmDetailViewModel @Inject constructor(
                     screenState.value = ScreenStateVo.CONTENT
                 }, {
                     screenState.value = ScreenStateVo.ERROR
-                })
+                }))
         }?: run { screenState.value = ScreenStateVo.ERROR }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        disposables.clear()
+    }
 }
